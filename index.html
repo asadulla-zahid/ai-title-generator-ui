@@ -254,6 +254,26 @@
         color: #667eea;
         font-weight: 600;
     }
+
+    .example-btn {
+        padding: 14px 20px;
+        background: white;
+        color: #667eea;
+        border: 2px solid #667eea;
+        border-radius: 10px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-align: left;
+    }
+
+    .example-btn:hover {
+        background: #667eea;
+        color: white;
+        transform: translateX(5px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
     
     @keyframes fadeIn {
         from {
@@ -363,10 +383,51 @@
     <div class="footer">
         Made by <strong>Asadullah Zahid</strong> • Powered by HuggingFace API
     </div>
+
+    <div style="margin-top: 30px; padding-top: 30px; border-top: 2px solid #f0f0f0;">
+        <h3 style="text-align: center; color: #667eea; margin-bottom: 20px;">Try These Examples</h3>
+        <div style="display: grid; gap: 12px; max-width: 900px; margin: 0 auto;">
+            <button class="example-btn" onclick="fillExample(0)">
+                🎉 Community Meetup Event
+            </button>
+            <button class="example-btn" onclick="fillExample(1)">
+                🚀 Product Launch Announcement
+            </button>
+            <button class="example-btn" onclick="fillExample(2)">
+                ✈️ Travel Blog Post
+            </button>
+            <button class="example-btn" onclick="fillExample(3)">
+                📚 Book Club Meeting
+            </button>
+        </div>
+    </div>
 </div>
 
 <script>
     const API_URL = "https://Asadulla-zahid-Ai-paragraph-parser.hf.space/analyze";
+
+    const exampleParagraphs = [
+        "Big announcement! 🎉✨ We're hosting our next community meetup this Saturday and you're all invited! 🤝💡 Join us for creativity, networking, and good vibes at 2901 Riverside Lane, Arlington, VA.\n\nWe'll kick things off at 4:00 PM, followed by a mini workshop and a chill hangout session afterwards. 🌿🍹 Whether you're building something new, looking for inspiration, or just want to meet awesome people—this is the place to be.\n\nCan't wait to see you all there! 🚀🔥\n\n#community #eventday #meetup2025 #goodvibes",
+        
+        "Exciting news from our team! 🚀💼 We're thrilled to announce the launch of our brand new product line coming this Monday, March 15th at 9:00 AM EST. The unveiling will take place at our headquarters in 450 Tech Boulevard, San Francisco, CA.\n\nThis has been months in the making and we can't wait to share what we've built with you all. Join us for a live demo at 10:30 AM, followed by Q&A sessions throughout the day. See you there! 🎊✨",
+        
+        "Just got back from an incredible journey! ✈️🌍 Spent the last two weeks exploring the beautiful streets of Paris, France and Barcelona, Spain. Our adventure started on October 3rd when we landed at Charles de Gaulle Airport around 6:45 AM.\n\nThe highlights? Visiting the Eiffel Tower at sunset on October 5th, wandering through La Sagrada Familia on October 12th at noon, and enjoying the best croissants at a small café on Rue de Rivoli. Travel really does feed the soul! 🥐🗼 #wanderlust #europe2024",
+        
+        "Book lovers unite! 📚☕ Our monthly book club is meeting this Thursday, November 21st at 7:00 PM at the cozy Central Library on 789 Main Street, Boston, MA. This month we're discussing 'The Midnight Library' and trust me, you don't want to miss this conversation!\n\nBring your favorite mug, your thoughts on the book, and get ready for some deep discussions. Light refreshments will be served at 6:45 PM. RSVP by Tuesday! 📖✨ #bookclub #reading #community"
+    ];
+
+    function fillExample(index) {
+        const paragraph = exampleParagraphs[index];
+        document.getElementById("paragraph").value = paragraph;
+        
+        // Scroll to top smoothly
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        
+        // Small delay to let user see the text filled, then auto-analyze
+        setTimeout(() => {
+            analyze();
+        }, 500);
+    }
 
     function showError(message) {
         const banner = document.getElementById("errorBanner");
