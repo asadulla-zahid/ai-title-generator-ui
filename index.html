@@ -142,6 +142,83 @@
     .results {
         margin-top: 40px;
     }
+
+    .suggested-panel {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 24px;
+        border-radius: 12px;
+        margin-bottom: 30px;
+        color: white;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .suggested-panel h3 {
+        margin: 0 0 16px 0;
+        font-size: 1.2rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .suggested-panel h3::before {
+        content: '⭐';
+        font-size: 1.3rem;
+    }
+
+    .suggested-grid {
+        display: grid;
+        gap: 12px;
+    }
+
+    .suggested-item {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        padding: 12px 16px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .suggested-item-label {
+        font-size: 13px;
+        opacity: 0.9;
+        font-weight: 600;
+        margin-bottom: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .suggested-item-value {
+        font-size: 15px;
+        font-weight: 500;
+        flex: 1;
+    }
+
+    .suggested-copy-btn {
+        padding: 6px 12px;
+        background: white;
+        color: #667eea;
+        border: none;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        white-space: nowrap;
+    }
+
+    .suggested-copy-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .suggested-copy-btn.copied {
+        background: #48bb78;
+        color: white;
+    }
     
     .section-title {
         font-size: 1.3rem;
@@ -364,6 +441,33 @@
     <div id="errorBanner" class="error-banner"></div>
 
     <div id="results" class="results" style="display:none;">
+        <div id="suggestedPanel" class="suggested-panel" style="display:none;">
+            <h3>Suggested Best Matches</h3>
+            <div class="suggested-grid">
+                <div class="suggested-item">
+                    <div style="flex: 1;">
+                        <div class="suggested-item-label">Best Title</div>
+                        <div class="suggested-item-value" id="suggestedTitle">-</div>
+                    </div>
+                    <button class="suggested-copy-btn" onclick="copySuggested('title', this)">Copy</button>
+                </div>
+                <div class="suggested-item">
+                    <div style="flex: 1;">
+                        <div class="suggested-item-label">Best Location</div>
+                        <div class="suggested-item-value" id="suggestedLocation">-</div>
+                    </div>
+                    <button class="suggested-copy-btn" onclick="copySuggested('location', this)">Copy</button>
+                </div>
+                <div class="suggested-item">
+                    <div style="flex: 1;">
+                        <div class="suggested-item-label">Best Date & Time</div>
+                        <div class="suggested-item-value" id="suggestedDatetime">-</div>
+                    </div>
+                    <button class="suggested-copy-btn" onclick="copySuggested('datetime', this)">Copy</button>
+                </div>
+            </div>
+        </div>
+
         <div>
             <div class="section-title">AI Generated Titles</div>
             <div id="titleList" class="tiles-grid"></div>
@@ -415,6 +519,56 @@
         
         "Book lovers unite! 📚☕ Our monthly book club is meeting this Thursday, November 21st at 7:00 PM at the cozy Central Library on 789 Main Street, Boston, MA. This month we're discussing 'The Midnight Library' and trust me, you don't want to miss this conversation!\n\nBring your favorite mug, your thoughts on the book, and get ready for some deep discussions. Light refreshments will be served at 6:45 PM. RSVP by Tuesday! 📖✨ #bookclub #reading #community"
     ];
+
+    let suggestedData = {
+        title: '',
+        location: '',
+        datetime: ''
+    };
+
+    function copySuggested(type, button) {
+        const text = suggestedData[type];
+        if (!text || text === '-') {
+            return;
+        }
+        copyToClipboard(text, button);
+    }
+
+    function selectBestMatches(data) {
+        // Select the most complete/accurate items from each category
+        let bestTitle = '';
+        let bestLocation = '';
+        let bestDatetime = '';
+
+        // Best title: prefer the first one or longest descriptive title
+        if (data.titles && data.titles.length > 0) {
+            bestTitle = data.titles[0];
+        }
+
+        // Best location: prefer the most complete address (with street numbers, city, state)
+        if (data.locations && data.locations.length > 0) {
+            const sorted = [...data.locations].sort((a, b) => {
+                const scoreA = (a.match(/\d+/g) || []).length + (a.match(/,/g) || []).length;
+                const scoreB = (b.match(/\d+/g) || []).length + (b.match(/,/g) || []).length;
+                return scoreB - scoreA;
+            });
+            bestLocation = sorted[0];
+        }
+
+        // Best datetime: prefer the most specific datetime with time included
+        if (data.datetimes && data.datetimes.length > 0) {
+            const sorted = [...data.datetimes].sort((a, b) => {
+                const hasTimeA = /\d+:\d+|AM|PM|am|pm/i.test(a);
+                const hasTimeB = /\d+:\d+|AM|PM|am|pm/i.test(b);
+                if (hasTimeA && !hasTimeB) return -1;
+                if (!hasTimeA && hasTimeB) return 1;
+                return b.length - a.length;
+            });
+            bestDatetime = sorted[0];
+        }
+
+        return { bestTitle, bestLocation, bestDatetime };
+    }
 
     function fillExample(index) {
         const paragraph = exampleParagraphs[index];
@@ -518,6 +672,25 @@
                 document.getElementById("results").style.display = "none";
             } else {
                 console.log(data);
+
+                // Select best matches
+                const { bestTitle, bestLocation, bestDatetime } = selectBestMatches(data);
+                
+                // Update suggested panel
+                suggestedData.title = bestTitle;
+                suggestedData.location = bestLocation;
+                suggestedData.datetime = bestDatetime;
+
+                document.getElementById("suggestedTitle").textContent = bestTitle || '-';
+                document.getElementById("suggestedLocation").textContent = bestLocation || '-';
+                document.getElementById("suggestedDatetime").textContent = bestDatetime || '-';
+
+                // Show suggested panel if we have at least one suggestion
+                if (bestTitle || bestLocation || bestDatetime) {
+                    document.getElementById("suggestedPanel").style.display = "block";
+                } else {
+                    document.getElementById("suggestedPanel").style.display = "none";
+                }
 
                 // Titles
                 const titleList = document.getElementById("titleList");
