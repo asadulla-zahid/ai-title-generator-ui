@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AI Paragraph Parser</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Simple, modern design -->
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f6f7fb;
+        padding: 40px;
+        margin: 0;
+        color: #333;
+    }
+    .container {
+        max-width: 850px;
+        margin: auto;
+        background: #fff;
+        padding: 30px;
+        border-radius: 14px;
+        box-shadow: 0 3px 20px rgba(0,0,0,0.12);
+    }
+    h1 {
+        text-align: center;
+        margin-bottom: 10px;
+        font-size: 2rem;
+    }
+    p {
+        text-align: center;
+        margin-top: 0;
+        color: #555;
+    }
+    textarea {
+        width: 100%;
+        height: 180px;
+        padding: 15px;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        font-size: 15px;
+        resize: vertical;
+    }
+    .btn {
+        width: 100%;
+        padding: 14px;
+        margin-top: 20px;
+        background: #4b7eff;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 17px;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+    .btn:hover {
+        background: #3a62d8;
+    }
+    .output-section {
+        margin-top: 30px;
+        background: #f1f4ff;
+        padding: 20px;
+        border-radius: 10px;
+    }
+    .title {
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+    ul {
+        padding-left: 20px;
+    }
+    .footer {
+        text-align: center;
+        margin-top: 35px;
+        color: #666;
+    }
+</style>
+
+</head>
+<body>
+
+<div class="container">
+    <h1>AI Paragraph Parser</h1>
+    <p>Generate intelligent titles and detect locations using your API.</p>
+
+    <textarea id="paragraph" placeholder="Paste your paragraph here..."></textarea>
+
+    <label for="numTitles" style="font-weight:600; display:block; margin-top:20px;">
+        Number of Titles:
+    </label>
+    <input type="number" id="numTitles" min="1" max="10" value="5"
+           style="width:120px; padding:8px; border-radius:8px; border:1px solid #ccc;">
+
+    <button class="btn" onclick="analyze()">Analyze Paragraph</button>
+
+    <div id="results" class="output-section" style="display:none;">
+        <div class="title">AI Generated Titles</div>
+        <ul id="titleList"></ul>
+
+        <div class="title" style="margin-top:20px;">Extracted Locations</div>
+        <ul id="locationList"></ul>
+    </div>
+</div>
+
+<div class="footer">Made by Asadullah Zahid • Powered by HuggingFace API</div>
+
+<script>
+    const API_URL = "https://Asadulla-zahid-Ai-paragraph-parser.hf.space/analyze";
+
+    async function analyze() {
+        const paragraph = document.getElementById("paragraph").value.trim();
+        const num = parseInt(document.getElementById("numTitles").value);
+
+        if (paragraph.length === 0) {
+            alert("Please enter a paragraph.");
+            return;
+        }
+
+        document.querySelector(".btn").innerText = "Processing...";
+        document.querySelector(".btn").disabled = true;
+
+        try {
+            const response = await fetch(API_URL, {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({
+                    paragraph: paragraph,
+                    num_titles: num
+                })
+            });
+
+            const data = await response.json();
+            console.log(data);
+
+            // Display titles
+            const titleList = document.getElementById("titleList");
+            titleList.innerHTML = "";
+            data.titles.forEach(t => {
+                titleList.innerHTML += `<li>${t}</li>`;
+            });
+
+            // Display locations
+            const locationList = document.getElementById("locationList");
+            locationList.innerHTML = "";
+            data.locations.forEach(loc => {
+                locationList.innerHTML += `<li>${loc}</li>`;
+            });
+
+            document.getElementById("results").style.display = "block";
+
+        } catch (err) {
+            alert("Error: " + err);
+            console.error(err);
+        }
+
+        document.querySelector(".btn").innerText = "Analyze Paragraph";
+        document.querySelector(".btn").disabled = false;
+    }
+</script>
+
+</body>
+</html>
