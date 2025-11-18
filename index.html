@@ -353,6 +353,11 @@
             <div class="section-title">Extracted Locations</div>
             <div id="locationList" class="tiles-grid"></div>
         </div>
+
+        <div>
+            <div class="section-title">Extracted Dates &amp; Times</div>
+            <div id="datetimeList" class="tiles-grid"></div>
+        </div>
     </div>
 
     <div class="footer">
@@ -467,6 +472,14 @@
                     locationList.innerHTML = data.locations.map((loc, idx) => createTile(loc, idx)).join('');
                 } else {
                     locationList.innerHTML = '<div class="empty-state">No locations detected</div>';
+                }
+
+                // Display dates & times
+                const datetimeList = document.getElementById("datetimeList");
+                if (data.datetimes && data.datetimes.length > 0) {
+                    datetimeList.innerHTML = data.datetimes.map((dt, idx) => createTile(dt, idx)).join('');
+                } else {
+                    datetimeList.innerHTML = '<div class="empty-state">No dates or times detected</div>';
                 }
 
                 document.getElementById("results").style.display = "block";
