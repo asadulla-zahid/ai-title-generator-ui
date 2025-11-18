@@ -5,74 +5,290 @@
 <title>AI Paragraph Parser</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<!-- Simple, modern design -->
 <style>
+    * {
+        box-sizing: border-box;
+    }
+    
     body {
-        font-family: Arial, sans-serif;
-        background: #f6f7fb;
-        padding: 40px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 20px;
         margin: 0;
         color: #333;
+        min-height: 100vh;
     }
+    
     .container {
-        max-width: 850px;
+        max-width: 900px;
         margin: auto;
         background: #fff;
-        padding: 30px;
-        border-radius: 14px;
-        box-shadow: 0 3px 20px rgba(0,0,0,0.12);
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
     }
+    
+    .header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+    
     h1 {
-        text-align: center;
+        margin: 0 0 10px 0;
+        font-size: 2.5rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 700;
+    }
+    
+    .subtitle {
+        color: #666;
+        font-size: 1.1rem;
+        margin: 0;
+    }
+    
+    .input-section {
+        margin-bottom: 30px;
+    }
+    
+    label {
+        display: block;
+        font-weight: 600;
         margin-bottom: 10px;
-        font-size: 2rem;
+        color: #444;
+        font-size: 0.95rem;
     }
-    p {
-        text-align: center;
-        margin-top: 0;
-        color: #555;
-    }
+    
     textarea {
         width: 100%;
         height: 180px;
-        padding: 15px;
-        border-radius: 10px;
-        border: 1px solid #ccc;
+        padding: 16px;
+        border-radius: 12px;
+        border: 2px solid #e0e0e0;
         font-size: 15px;
         resize: vertical;
+        font-family: inherit;
+        transition: border-color 0.3s, box-shadow 0.3s;
     }
-    .btn {
-        width: 100%;
-        padding: 14px;
+    
+    textarea:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .controls {
+        display: flex;
+        gap: 20px;
+        align-items: flex-end;
         margin-top: 20px;
-        background: #4b7eff;
+    }
+    
+    .input-group {
+        flex: 0 0 200px;
+    }
+    
+    input[type="number"] {
+        width: 100%;
+        padding: 12px;
+        border-radius: 10px;
+        border: 2px solid #e0e0e0;
+        font-size: 15px;
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    
+    input[type="number"]:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .btn {
+        flex: 1;
+        padding: 14px 28px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
         border: none;
-        border-radius: 10px;
+        border-radius: 12px;
         font-size: 17px;
+        font-weight: 600;
         cursor: pointer;
-        transition: 0.2s;
+        transition: transform 0.2s, box-shadow 0.2s;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
     }
-    .btn:hover {
-        background: #3a62d8;
+    
+    .btn:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
     }
-    .output-section {
-        margin-top: 30px;
-        background: #f1f4ff;
-        padding: 20px;
-        border-radius: 10px;
+    
+    .btn:active:not(:disabled) {
+        transform: translateY(0);
     }
-    .title {
-        font-weight: bold;
-        margin-bottom: 10px;
+    
+    .btn:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
     }
-    ul {
-        padding-left: 20px;
+    
+    .results {
+        margin-top: 40px;
     }
+    
+    .section-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .section-title::before {
+        content: '';
+        width: 4px;
+        height: 24px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 2px;
+    }
+    
+    .tiles-grid {
+        display: grid;
+        gap: 12px;
+        margin-bottom: 35px;
+    }
+    
+    .tile {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        padding: 16px 20px;
+        border-radius: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        transition: transform 0.2s, box-shadow 0.2s;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    
+    .tile:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    }
+    
+    .tile-content {
+        flex: 1;
+        color: #2d3748;
+        font-size: 15px;
+        line-height: 1.5;
+        word-break: break-word;
+    }
+    
+    .copy-btn {
+        flex-shrink: 0;
+        padding: 8px 16px;
+        background: white;
+        color: #667eea;
+        border: 2px solid #667eea;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        white-space: nowrap;
+    }
+    
+    .copy-btn:hover {
+        background: #667eea;
+        color: white;
+        transform: scale(1.05);
+    }
+    
+    .copy-btn:active {
+        transform: scale(0.98);
+    }
+    
+    .copy-btn.copied {
+        background: #48bb78;
+        border-color: #48bb78;
+        color: white;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+        color: #999;
+        font-style: italic;
+    }
+    
     .footer {
         text-align: center;
-        margin-top: 35px;
-        color: #666;
+        margin-top: 50px;
+        padding-top: 30px;
+        border-top: 2px solid #f0f0f0;
+        color: #888;
+        font-size: 14px;
+    }
+    
+    .footer strong {
+        color: #667eea;
+        font-weight: 600;
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .tile {
+        animation: fadeIn 0.3s ease forwards;
+    }
+    
+    .tile:nth-child(1) { animation-delay: 0.05s; }
+    .tile:nth-child(2) { animation-delay: 0.1s; }
+    .tile:nth-child(3) { animation-delay: 0.15s; }
+    .tile:nth-child(4) { animation-delay: 0.2s; }
+    .tile:nth-child(5) { animation-delay: 0.25s; }
+    .tile:nth-child(6) { animation-delay: 0.3s; }
+    .tile:nth-child(7) { animation-delay: 0.35s; }
+    .tile:nth-child(8) { animation-delay: 0.4s; }
+    .tile:nth-child(9) { animation-delay: 0.45s; }
+    .tile:nth-child(10) { animation-delay: 0.5s; }
+    
+    @media (max-width: 768px) {
+        .container {
+            padding: 25px;
+        }
+        
+        h1 {
+            font-size: 2rem;
+        }
+        
+        .controls {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .input-group {
+            flex: 1;
+        }
+        
+        .tile {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .copy-btn {
+            align-self: flex-end;
+        }
     }
 </style>
 
@@ -80,32 +296,68 @@
 <body>
 
 <div class="container">
-    <h1>AI Paragraph Parser</h1>
-    <p>Generate intelligent titles and detect locations using your API.</p>
+    <div class="header">
+        <h1>AI Paragraph Parser</h1>
+        <p class="subtitle">Generate intelligent titles and detect locations using AI</p>
+    </div>
 
-    <textarea id="paragraph" placeholder="Paste your paragraph here..."></textarea>
+    <div class="input-section">
+        <label for="paragraph">Your Paragraph</label>
+        <textarea id="paragraph" placeholder="Paste your paragraph here..."></textarea>
+    </div>
 
-    <label for="numTitles" style="font-weight:600; display:block; margin-top:20px;">
-        Number of Titles:
-    </label>
-    <input type="number" id="numTitles" min="1" max="10" value="5"
-           style="width:120px; padding:8px; border-radius:8px; border:1px solid #ccc;">
+    <div class="controls">
+        <div class="input-group">
+            <label for="numTitles">Number of Titles</label>
+            <input type="number" id="numTitles" min="1" max="10" value="5">
+        </div>
+        <button class="btn" onclick="analyze()">Analyze Paragraph</button>
+    </div>
 
-    <button class="btn" onclick="analyze()">Analyze Paragraph</button>
+    <div id="results" class="results" style="display:none;">
+        <div>
+            <div class="section-title">AI Generated Titles</div>
+            <div id="titleList" class="tiles-grid"></div>
+        </div>
 
-    <div id="results" class="output-section" style="display:none;">
-        <div class="title">AI Generated Titles</div>
-        <ul id="titleList"></ul>
+        <div>
+            <div class="section-title">Extracted Locations</div>
+            <div id="locationList" class="tiles-grid"></div>
+        </div>
+    </div>
 
-        <div class="title" style="margin-top:20px;">Extracted Locations</div>
-        <ul id="locationList"></ul>
+    <div class="footer">
+        Made by <strong>Asadullah Zahid</strong> • Powered by HuggingFace API
     </div>
 </div>
 
-<div class="footer">Made by Asadullah Zahid • Powered by HuggingFace API</div>
-
 <script>
     const API_URL = "https://Asadulla-zahid-Ai-paragraph-parser.hf.space/analyze";
+
+    function copyToClipboard(text, button) {
+        navigator.clipboard.writeText(text).then(() => {
+            const originalText = button.textContent;
+            button.textContent = 'Copied!';
+            button.classList.add('copied');
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.classList.remove('copied');
+            }, 2000);
+        }).catch(err => {
+            console.error('Failed to copy:', err);
+            alert('Failed to copy to clipboard');
+        });
+    }
+
+    function createTile(content, index) {
+        return `
+            <div class="tile" style="opacity: 0;">
+                <div class="tile-content">${content}</div>
+                <button class="copy-btn" onclick="copyToClipboard('${content.replace(/'/g, "\\'")}', this)">Copy</button>
+            </div>
+        `;
+    }
 
     async function analyze() {
         const paragraph = document.getElementById("paragraph").value.trim();
@@ -116,8 +368,9 @@
             return;
         }
 
-        document.querySelector(".btn").innerText = "Processing...";
-        document.querySelector(".btn").disabled = true;
+        const btn = document.querySelector(".btn");
+        btn.textContent = "Processing...";
+        btn.disabled = true;
 
         try {
             const response = await fetch(API_URL, {
@@ -134,17 +387,19 @@
 
             // Display titles
             const titleList = document.getElementById("titleList");
-            titleList.innerHTML = "";
-            data.titles.forEach(t => {
-                titleList.innerHTML += `<li>${t}</li>`;
-            });
+            if (data.titles && data.titles.length > 0) {
+                titleList.innerHTML = data.titles.map((title, idx) => createTile(title, idx)).join('');
+            } else {
+                titleList.innerHTML = '<div class="empty-state">No titles generated</div>';
+            }
 
             // Display locations
             const locationList = document.getElementById("locationList");
-            locationList.innerHTML = "";
-            data.locations.forEach(loc => {
-                locationList.innerHTML += `<li>${loc}</li>`;
-            });
+            if (data.locations && data.locations.length > 0) {
+                locationList.innerHTML = data.locations.map((loc, idx) => createTile(loc, idx)).join('');
+            } else {
+                locationList.innerHTML = '<div class="empty-state">No locations detected</div>';
+            }
 
             document.getElementById("results").style.display = "block";
 
@@ -153,8 +408,8 @@
             console.error(err);
         }
 
-        document.querySelector(".btn").innerText = "Analyze Paragraph";
-        document.querySelector(".btn").disabled = false;
+        btn.textContent = "Analyze Paragraph";
+        btn.disabled = false;
     }
 </script>
 
